@@ -1,5 +1,7 @@
 import express from "express";
-import { getProducts, getSingleProduct } from "../controllers/productController.js";
+import { createProduct, getProducts, getSingleProduct } from "../controllers/productController.js";
+import upload from "../middleware/upload.js";
+import { authorize, protect } from "../middleware/Auth.js";
 
 const productRouter = express.Router();
 
@@ -16,7 +18,7 @@ productRouter.get("/:id", getSingleProduct);
 
 
 // create product
-
+productRouter.post("/", upload.array("images", 5), protect, authorize("admin"), createProduct)
 
 // update products
 
