@@ -33,6 +33,6 @@ cartSchema.methods.calculateTotal = function (this: ICart) {
 }
 
 
-const Cart = mongoose.model<ICart>("Cart",cartSchema);
+const Cart = mongoose.model<ICart>("Cart", cartSchema);
 
 export default Cart
