@@ -8,6 +8,7 @@ import makeAdmin from "./scripts/makeAdmin.js";
 import productRouter from "./routes/productRoutes.js";
 import CartRouter from "./routes/cartRoutes.js";
 import OrderRoute from "./routes/orderRoutes.js";
+import morgan from "morgan";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.post('/api/clerk', express.raw({ type: "application/json" }), clerkwebhook)
 
 // Middleware
 app.use(cors())
+app.use(morgan("dev"))
 app.use(express.json());
 app.use(clerkMiddleware())
 
