@@ -109,7 +109,7 @@ export const createOrder = async (req: Request, res: Response) => {
             orderNumber: "ORD-" + Date.now()
         })
 
-        if(req.body.paymentMethod !== "stripe"){
+        if (req.body.paymentMethod !== "stripe") {
             cart.items = []
             cart.totalAmount = 0;
             await cart.save()
@@ -122,3 +122,56 @@ export const createOrder = async (req: Request, res: Response) => {
 }
 
 
+
+// update order status
+
+
+export const updateOrderStatus = async (req: Request, res: Response) => {
+    try {
+
+        const { orderStatus, paymentStatus } = req.body;
+
+        const order = await Order.findById(req.params.id);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" })
+        }
+
+        if (orderStatus) order.orderStatus = orderStatus;
+        if (paymentStatus) order.paymentStatus = paymentStatus;
+        if (orderStatus === "delivered") order.deliveredAt = new Date()
+
+        await order.save();
+        res.json({ success: true, data: order })
+
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message })
+    }
+}
+
+
+// get all orders
+
+// GET /api/orders/admin/all
+
+export const getAllOrders = async (req: Request, res: Response) => {
+    try {
+        const { page = 1, limit = 20, status } = req.query;
+
+        const query: any = {};
+
+        if (status) query.orderStatus = status;
+
+        const total = await Order.countDocuments(query)
+
+        const orders = await Order.find(query).populate("user", "name email").populate("items.product", "name").sort("-createdAt").skip((Number(page) - 1) * Number(limit));
+
+        res.json({
+            success: true,
+            data: orders,
+            pagination: { total, page: Number(page), pages: Math.ceil(total / Number(limit)) }
+        })
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message })
+    }
+}

@@ -7,6 +7,7 @@ import { clerkwebhook } from "./controllers/webhooks.js";
 import makeAdmin from "./scripts/makeAdmin.js";
 import productRouter from "./routes/productRoutes.js";
 import CartRouter from "./routes/cartRoutes.js";
+import OrderRoute from "./routes/orderRoutes.js";
 
 const app = express();
 
@@ -14,7 +15,7 @@ const app = express();
 // database connect
 await connectDB()
 
-app.post('/api/clerk', express.raw({ type: "application/json" }),clerkwebhook)
+app.post('/api/clerk', express.raw({ type: "application/json" }), clerkwebhook)
 
 // Middleware
 app.use(cors())
@@ -27,8 +28,9 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Server is Live!');
 });
 
-app.use("/api/products",productRouter);
-app.use("/api/cart",CartRouter);
+app.use("/api/products", productRouter);
+app.use("/api/cart", CartRouter);
+app.use("/api/order", OrderRoute)
 
 await makeAdmin()
 
