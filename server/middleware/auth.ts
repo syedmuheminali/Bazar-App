@@ -9,7 +9,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
             return res.status(401).json({
                 success: false,
                 message: "Not authorized"
-            });
+            })
         }
 
         // Correct query
