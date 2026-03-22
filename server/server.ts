@@ -13,34 +13,38 @@ import AdminRoute from "./routes/AdminRoutes.js";
 
 const app = express();
 
+// DB connect (IMPORTANT: wrap in function)
+let isConnected = false;
+const connect = async () => {
+    if (!isConnected) {
+        await connectDB();
+        isConnected = true;
+    }
+};
+await connect();
 
-// database connect
-await connectDB()
+// webhook route (raw body)
+app.post('/api/clerk', express.raw({ type: "application/json" }), clerkwebhook);
 
-app.post('/api/clerk', express.raw({ type: "application/json" }), clerkwebhook)
-
-// Middleware
-app.use(cors())
+// middleware
+app.use(cors());
 app.use(express.json());
-app.use(clerkMiddleware())
+app.use(clerkMiddleware());
 
-const port = process.env.PORT || 3000;
-
+// test route
 app.get('/', (req: Request, res: Response) => {
     res.send('Server is Live!');
 });
 
+// routes
 app.use("/api/products", productRouter);
 app.use("/api/cart", CartRouter);
 app.use("/api/orders", OrderRoute);
-app.use("/api/addresses",AddressRoute);
-app.use("/api/admin",AdminRoute);
+app.use("/api/addresses", AddressRoute);
+app.use("/api/admin", AdminRoute);
 
-await makeAdmin()
+// run once
+await makeAdmin();
 
-app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
-});
-
-
-
+// ✅ IMPORTANT: export default (NO listen)
+export default app;
