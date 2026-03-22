@@ -1,7 +1,7 @@
 import express from "express";
 import { createProduct, getProducts, getSingleProduct, updateProduct, deleteProduct } from "../controllers/productController.js";
 import upload from "../middleware/upload.js";
-import { protect,authorize } from "../middleware/Auth";
+import { protect,authorize } from "../middleware/Auth.js";
 
 const productRouter = express.Router();
 

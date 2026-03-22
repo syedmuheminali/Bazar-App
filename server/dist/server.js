@@ -9,7 +9,6 @@ import productRouter from "./routes/productRoutes.js";
 import CartRouter from "./routes/cartRoutes.js";
 import OrderRoute from "./routes/orderRoutes.js";
 import AddressRoute from "./routes/AddressRoute.js";
-import morgan from "morgan";
 import AdminRoute from "./routes/AdminRoutes.js";
 const app = express();
 // database connect
@@ -17,10 +16,9 @@ await connectDB();
 app.post('/api/clerk', express.raw({ type: "application/json" }), clerkwebhook);
 // Middleware
 app.use(cors());
-app.use(morgan("dev"));
 app.use(express.json());
 app.use(clerkMiddleware());
-const port = process.env.PORT || 3000;
+const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 app.get('/', (req, res) => {
     res.send('Server is Live!');
 });
@@ -30,6 +28,6 @@ app.use("/api/orders", OrderRoute);
 app.use("/api/addresses", AddressRoute);
 app.use("/api/admin", AdminRoute);
 await makeAdmin();
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running at http://localhost:${port}`);
 });

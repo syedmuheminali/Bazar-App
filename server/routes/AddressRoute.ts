@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middleware/Auth";
+import { protect } from "../middleware/Auth.js";
 import { addAddresses, DeleteAddresses, getAddresses, updateAddresses } from "../controllers/addressController.js";
 
 
