@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "server.ts",
   "scripts": {
-    "start": "tsx server.ts",
     "server": "nodemon --exec tsx server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "type": "module",
   "keywords": [],
