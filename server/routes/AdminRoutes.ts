@@ -1,5 +1,5 @@
 import express from "express";
-import { protect,authorize } from "../middleware/Auth.js";
+import { protect,authorize } from "../middleware/Auth";
 import { getDasboardStats } from "../controllers/adminControll.js";
 
 const AdminRoute = express.Router();

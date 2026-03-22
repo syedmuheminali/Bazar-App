@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middleware/Auth.js";
+import { protect } from "../middleware/Auth";
 import { getCart, AddToCrat, ClearCartItems, RemoveCartItems, UpdateCartItems } from "../controllers/cartController.js";
 
 
