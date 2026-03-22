@@ -23,7 +23,7 @@ OrderRoute.put("/:id/status", protect, authorize("admin"), updateOrderStatus)
 // get all orders admin only
 
 
-OrderRoute.get("/", protect, getAllOrders)
+OrderRoute.get("/admin/all", protect,authorize("admin"), getAllOrders)
 
 
 export default OrderRoute

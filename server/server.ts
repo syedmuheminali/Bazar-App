@@ -8,7 +8,9 @@ import makeAdmin from "./scripts/makeAdmin.js";
 import productRouter from "./routes/productRoutes.js";
 import CartRouter from "./routes/cartRoutes.js";
 import OrderRoute from "./routes/orderRoutes.js";
+import AddressRoute from "./routes/AddressRoute.js";
 import morgan from "morgan";
+import AdminRoute from "./routes/AdminRoutes.js";
 
 const app = express();
 
@@ -32,7 +34,9 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use("/api/products", productRouter);
 app.use("/api/cart", CartRouter);
-app.use("/api/order", OrderRoute)
+app.use("/api/orders", OrderRoute);
+app.use("/api/addresses",AddressRoute);
+app.use("/api/admin",AdminRoute);
 
 await makeAdmin()
 
