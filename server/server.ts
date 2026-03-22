@@ -9,7 +9,6 @@ import productRouter from "./routes/productRoutes.js";
 import CartRouter from "./routes/cartRoutes.js";
 import OrderRoute from "./routes/orderRoutes.js";
 import AddressRoute from "./routes/AddressRoute.js";
-import morgan from "morgan";
 import AdminRoute from "./routes/AdminRoutes.js";
 
 const app = express();
@@ -22,7 +21,6 @@ app.post('/api/clerk', express.raw({ type: "application/json" }), clerkwebhook)
 
 // Middleware
 app.use(cors())
-app.use(morgan("dev"))
 app.use(express.json());
 app.use(clerkMiddleware())
 
