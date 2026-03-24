@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(clerkMiddleware());
 app.post('/api/clerk', express.raw({ type: "application/json" }), clerkwebhook);
 app.get('/', (req, res) => {
-    res.send('Server is Live!');
+    res.json({ message: "Api Live ✅ " });
 });
 app.use("/api/products", productRouter);
 app.use("/api/cart", CartRouter);
@@ -29,8 +29,9 @@ const port = process.env.PORT || 3000;
 const startServer = async () => {
     await connectDB(); // await MongoDB connection
     await makeAdmin(); // create admin after DB connected
-    app.listen(port, () => {
-        console.log(`🚀 Server is running at http://localhost:${port}`);
-    });
+    // app.listen(port, () => {
+    //   console.log(`🚀 Server is running at http://localhost:${port}`);
+    // });
 };
+// server livehttps://bazar-app-six.vercel.app/
 startServer();
