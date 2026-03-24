@@ -11,14 +11,11 @@ import OrderRoute from "./routes/orderRoutes.js";
 import AddressRoute from "./routes/AddressRoute.js";
 import AdminRoute from "./routes/AdminRoutes.js";
 const app = express();
-// database connect
-await connectDB();
-app.post('/api/clerk', express.raw({ type: "application/json" }), clerkwebhook);
-// Middleware
+// Middleware        
 app.use(cors());
 app.use(express.json());
 app.use(clerkMiddleware());
-const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+app.post('/api/clerk', express.raw({ type: "application/json" }), clerkwebhook);
 app.get('/', (req, res) => {
     res.send('Server is Live!');
 });
@@ -27,7 +24,13 @@ app.use("/api/cart", CartRouter);
 app.use("/api/orders", OrderRoute);
 app.use("/api/addresses", AddressRoute);
 app.use("/api/admin", AdminRoute);
-await makeAdmin();
-app.listen(port, '0.0.0.0', () => {
-    console.log(`Server is running at http://localhost:${port}`);
-});
+// Start server only after MongoDB connected
+const port = process.env.PORT || 3000;
+const startServer = async () => {
+    await connectDB(); // await MongoDB connection
+    await makeAdmin(); // create admin after DB connected
+    app.listen(port, () => {
+        console.log(`🚀 Server is running at http://localhost:${port}`);
+    });
+};
+startServer();

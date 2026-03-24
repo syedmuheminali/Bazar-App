@@ -1,14 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "Node16",            // <-- change from ESNext to Node16
-    "moduleResolution": "Node16",
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "outDir": "./dist",
     "rootDir": "./",
-    "strict": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "include": ["./**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+    "strict": true,
+    "skipLibCheck": true
+  }
 }

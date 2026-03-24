@@ -14,32 +14,35 @@ import AdminRoute from "./routes/AdminRoutes.js";
 const app = express();
 
 
-// database connect
-await connectDB()
-
-app.post('/api/clerk', express.raw({ type: "application/json" }), clerkwebhook)
-
-// Middleware
+// Middleware        
 app.use(cors())
 app.use(express.json());
-app.use(clerkMiddleware())
+app.use(clerkMiddleware());
+app.post('/api/clerk', express.raw({ type: "application/json" }), clerkwebhook)
 
-const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Server is Live!');
+    res.json({message:"Api Working ✅ "});
 });
 
 app.use("/api/products", productRouter);
 app.use("/api/cart", CartRouter);
 app.use("/api/orders", OrderRoute);
-app.use("/api/addresses",AddressRoute);
-app.use("/api/admin",AdminRoute);
+app.use("/api/addresses", AddressRoute);
+app.use("/api/admin", AdminRoute);
 
-await makeAdmin()
 
-app.listen(port, '0.0.0.0', () => {
-    console.log(`Server is running at http://localhost:${port}`);
-});
+// Start server only after MongoDB connected
+const port = process.env.PORT || 3000;
 
+const startServer = async () => {
+  await connectDB();  // await MongoDB connection
+  await makeAdmin();  // create admin after DB connected
+
+//   app.listen(port, () => {
+//     console.log(`🚀 Server is running at http://localhost:${port}`);
+//   });
+};
+
+startServer();
 
