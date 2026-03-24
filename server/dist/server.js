@@ -35,3 +35,4 @@ const startServer = async () => {
 };
 // server livehttps://bazar-app-six.vercel.app/
 startServer();
+export default app;
