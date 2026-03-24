@@ -22,7 +22,7 @@ app.post('/api/clerk', express.raw({ type: "application/json" }), clerkwebhook)
 
 
 app.get('/', (req: Request, res: Response) => {
-    res.json({message:"Api Working ✅ "});
+    res.json({message:"Api Live ✅ "});
 });
 
 app.use("/api/products", productRouter);
@@ -39,10 +39,12 @@ const startServer = async () => {
   await connectDB();  // await MongoDB connection
   await makeAdmin();  // create admin after DB connected
 
-//   app.listen(port, () => {
-//     console.log(`🚀 Server is running at http://localhost:${port}`);
-//   });
+  // app.listen(port, () => {
+  //   console.log(`🚀 Server is running at http://localhost:${port}`);
+  // });
 };
+
+// server livehttps://bazar-app-six.vercel.app/
 
 startServer();
 
