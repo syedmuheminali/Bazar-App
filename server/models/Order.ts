@@ -21,7 +21,6 @@ const OrderSchema = new Schema<IOrder>({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
-        unique: true
     },
     orderNumber: { type: String, unique: true },
     items: [OrderItemSchema],

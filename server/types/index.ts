@@ -29,7 +29,7 @@ export interface ICart extends Document {
 }
 
 export interface IOrderItem {
-    product: Types.ObjectId;
+    product: Types.ObjectId | IProduct;
     name: string;
     quantity: number;
     price: number;
@@ -86,6 +86,7 @@ export interface IUser extends Document {
     clerkId: string;
     image?: string;
     role: "user" | "admin";
+    pushToken: string | null;
     createdAt: Date;
     updatedAt: Date;
 }

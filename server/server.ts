@@ -1,4 +1,5 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config();
 import express, { Request, Response } from 'express';
 import cors from "cors";
 import connectDB from "./config/db.js";
@@ -10,11 +11,13 @@ import CartRouter from "./routes/cartRoutes.js";
 import OrderRoute from "./routes/orderRoutes.js";
 import AddressRoute from "./routes/AddressRoute.js";
 import AdminRoute from "./routes/AdminRoutes.js";
+import morgan from "morgan";
 
 const app = express();
 
 
 // Middleware        
+app.use(morgan("dev"));
 app.use(cors())
 app.use(express.json());
 app.use(clerkMiddleware());
@@ -35,6 +38,10 @@ app.use("/api/admin", AdminRoute);
 // Start server only after MongoDB connected
 const port = process.env.PORT || 3000;
 
+console.log("CLOUD NAME:", process.env.CLOUDINARY_CLOUD_NAME);
+console.log("API KEY:", process.env.CLOUDINARY_API_KEY);
+console.log("API SECRET:", process.env.CLOUDINARY_API_SECRET ? "EXISTS" : "MISSING");
+
 const startServer = async () => {
   await connectDB();  // await MongoDB connection
   await makeAdmin();  // create admin after DB connected
@@ -44,7 +51,7 @@ const startServer = async () => {
   // });
 };
 
-// server livehttps://bazar-app-six.vercel.app/
+// server live https://bazar-app-dusky.vercel.app/
 
 startServer();
 

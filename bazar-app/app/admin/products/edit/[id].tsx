@@ -6,10 +6,13 @@ import { COLORS, CATEGORIES } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { dummyProducts } from "@/assets/assets";
+import api from "@/constants/api";
+import { useAuth } from "@clerk/expo";
 
 export default function EditProduct() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
+       const { getToken } = useAuth()
 
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -31,20 +34,24 @@ export default function EditProduct() {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const product: any = dummyProducts.find((p) => p._id === id);
-                setName(product.name);
-                setDescription(product.description || "");
-                setPrice(product.price.toString());
-                setStock(product.stock.toString());
-                setCategory(typeof product.category === 'object' ? product.category.name : product.category);
-                setIsFeatured(product.isFeatured);
+              const { data } = await api.get(`/products/${id}`);
+                if (data.success) {
+                    const product = data.data
+                    setName(product.name);
+                    setDescription(product.description || "");
+                    setPrice(product.price.toString());
+                    setStock(product.stock.toString());
+                    setCategory(typeof product.category === 'object' ? product.category.name : product.category);
+                    setIsFeatured(product.isFeatured);
 
-                if (product.sizes) setSizes(Array.isArray(product.sizes) ? product.sizes.join(", ") : product.sizes);
 
-                if (product.images && Array.isArray(product.images)) {
-                    setExistingImages(product.images);
-                } else if (product.images) {
-                    setExistingImages([product.images]);
+                    if (product.sizes) setSizes(Array.isArray(product.sizes) ? product.sizes.join(", ") : product.sizes);
+
+                    if (product.images && Array.isArray(product.images)) {
+                        setExistingImages(product.images);
+                    } else if (product.images) {
+                        setExistingImages([product.images]);
+                    }
                 }
             } catch (error: any) {
                 console.error("Failed to fetch product:", error);
@@ -100,6 +107,7 @@ export default function EditProduct() {
 
         try {
             setSubmitting(true);
+              const token = await getToken();
             const formData = new FormData();
 
             formData.append("name", name);
@@ -125,7 +133,24 @@ export default function EditProduct() {
                     formData.append("images", { uri, name: filename, type: "image/jpeg" } as any);
                 }
             }
-            router.back();
+
+            const { data } = await api.put(`/products/${id}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data"
+                }
+            });
+
+            if (!data?.success) throw new Error("Upload Failed");
+
+            Toast.show({
+                type: "success",
+                text1: "Success",
+                text2: "Product Updated Successfully"
+            });
+
+            router.replace("/admin/products");
+
         } catch (error: any) {
             console.error("Failed to update product:", error);
             Toast.show({

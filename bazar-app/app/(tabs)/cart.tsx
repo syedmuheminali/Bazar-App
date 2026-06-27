@@ -37,7 +37,7 @@ export default function Cart() {
               <Text className='text-secondary font-bold'>Rs: {shipping.toFixed(2)}</Text>
             </View>
             {/* border */}
-            <View className='h-[1px] bg-border mb-4'/>
+            <View className='h-[1px] bg-border mb-4' />
             {/* total */}
             <View className='flex-row justify-between mb-6'>
               <Text className='text-primary font-bold text-lg'>Total</Text>

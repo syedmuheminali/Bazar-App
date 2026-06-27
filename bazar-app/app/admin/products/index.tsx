@@ -3,18 +3,39 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View, ActivityIndicator, RefreshControl, Image, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants";
-import { dummyProducts } from "@/assets/assets";
+import api from "@/constants/api";
+import { useAuth } from "@clerk/expo";
+import Toast from "react-native-toast-message";
 
 export default function AdminProducts() {
+    const { getToken } = useAuth()
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [products, setProducts] = useState([]);
 
+
     const fetchProducts = async () => {
-        setProducts(dummyProducts as any);
-        setLoading(false);
-        setRefreshing(false);
+        try {
+            const token = await getToken();
+
+            const { data } = await api.get('/products', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+
+            if (data?.success) {
+                setProducts(data?.data || []); 
+            }
+        } catch (error: any) {
+            console.error("Failed to fetch admin Products:", error)
+        }
+
+        finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
     };
 
     useEffect(() => {
@@ -27,7 +48,23 @@ export default function AdminProducts() {
     };
 
     const performDelete = async (id: string) => {
-        setProducts(products.filter((product: any) => product._id !== id) as any);
+        const token = await getToken();
+
+        const { data } = await api.delete(`/products/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+
+        if (!data?.success) throw new Error("Not Deleted");
+
+        Toast.show({
+            type: "success",
+            text1: "Success",
+            text2: "Product Deleted Successfully"
+        });
+
+        router.replace("/admin/products");
     };
 
     const deleteProduct = async (id: string) => {
@@ -70,36 +107,36 @@ export default function AdminProducts() {
                 className="flex-1 p-2"
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
             >
-                {products.length === 0 ? (
+                {products?.length === 0 ? (
                     <View className="flex-1 justify-center items-center mt-20">
                         <Text className="text-secondary">No products found</Text>
                     </View>
                 ) : (
-                    products.map((product: any) => (
-                        <View key={product._id} className="bg-white p-3 rounded-lg border border-gray-100 mb-3 flex-row items-center">
+                    products && products?.map((product: any) => (
+                        <View key={product?._id} className="bg-white p-3 rounded-lg border border-gray-100 mb-3 flex-row items-center">
                             <Image
-                                source={{ uri: product.images && product.images.length > 0 ? product.images[0] : 'https://via.placeholder.com/150' }}
+                                source={{ uri: product?.images && product?.images?.length > 0 ? product?.images[0] : 'https://via.placeholder.com/150' }}
                                 className="w-16 h-16 rounded-lg bg-gray-100 mr-3"
                                 resizeMode="cover"
                             />
 
                             <View className="flex-1">
-                                <Text className="font-bold text-primary text-base" numberOfLines={1}>{product.name}</Text>
-                                <Text className="text-secondary text-xs mb-1" numberOfLines={1}>Category : {product.category || 'Others'}</Text>
-                                <Text className="text-secondary text-xs mb-1" numberOfLines={1}>Stock : {product.stock}</Text>
-                                <Text className="text-secondary text-xs mb-1" numberOfLines={1}>Sizes : {product.sizes.join(", ")}</Text>
+                                <Text className="font-bold text-primary text-base" numberOfLines={1}>{product?.name}</Text>
+                                <Text className="text-secondary text-xs mb-1" numberOfLines={1}>Category : {product?.category || 'Others'}</Text>
+                                <Text className="text-secondary text-xs mb-1" numberOfLines={1}>Stock : {product?.stock}</Text>
+                                <Text className="text-secondary text-xs mb-1" numberOfLines={1}>Sizes : {product?.sizes?.join(", ") || "N/A"}</Text>
                                 <Text className="text-primary font-bold">${product.price.toFixed(2)}</Text>
                             </View>
 
                             <View className="flex-row items-center">
                                 <TouchableOpacity
-                                    onPress={() => router.push(`/admin/products/edit/${product._id}`)}
+                                    onPress={() => router.push(`/admin/products/edit/${product?._id}`)}
                                     className="p-2 bg-slate-50 rounded-full mr-2"
                                 >
                                     <Ionicons name="create-outline" size={18} color="#333333" />
                                 </TouchableOpacity>
                                 <TouchableOpacity
-                                    onPress={() => deleteProduct(product._id)}
+                                    onPress={() => deleteProduct(product?._id)}
                                     className="p-2 bg-gray-50 rounded-full"
                                 >
                                     <Ionicons name="trash-outline" size={18} color="#333333" />

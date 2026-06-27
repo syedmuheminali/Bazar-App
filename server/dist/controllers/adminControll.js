@@ -11,7 +11,7 @@ export const getDasboardStats = async (req, res) => {
         const validOrders = await Order.find({ orderStatus: { $ne: "cancelled" } });
         const totalRevenue = await validOrders.reduce((sum, order) => sum + order.totalAmount, 0);
         const recentOrders = await Order.find().sort("-createdAt").limit(5).populate("user", "name email");
-        res.status(200).json({ success: true, data: totalUser, totalProduct, totalOrders, totalRevenue, recentOrders });
+        res.status(200).json({ success: true, totalUser: totalUser, totalProduct, totalOrders, totalRevenue, recentOrders });
     }
     catch (error) {
         res.status(500).json({ success: false, message: error.message });

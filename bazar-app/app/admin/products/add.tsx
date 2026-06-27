@@ -5,8 +5,14 @@ import { COLORS } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { CATEGORIES } from "@/constants";
+import { useRouter } from "expo-router";
+import { useAuth } from "@clerk/expo";
+import api from "@/constants/api";
 
 export default function AddProduct() {
+
+    const router = useRouter();
+    const { getToken } = useAuth()
 
     const [submitting, setSubmitting] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
@@ -36,7 +42,6 @@ export default function AddProduct() {
         }
     };
 
-    // Add Product
     const handleSubmit = async () => {
         if (!name || !price || !category || sizes.length < 1) {
             Toast.show({
@@ -45,6 +50,71 @@ export default function AddProduct() {
                 text2: 'Please fill in all required fields'
             });
             return;
+        }
+
+        try {
+            setSubmitting(true);
+
+            const token = await getToken();
+            const formData = new FormData();
+
+            formData.append("name", name);
+            formData.append("description", description || "");
+            formData.append("price", price);
+            formData.append("stock", stock || "0");
+            formData.append("category", category);
+            formData.append("isFeatured", String(isFeatured));
+
+            formData.append("sizes", JSON.stringify(sizes));
+
+            images.forEach((img, i) => {
+                // agar img object hai (recommended)
+                const uri = img.uri || img;
+
+                const fileType = uri.split('.').pop()?.toLowerCase();
+
+                formData.append("images", {
+                    uri: uri,
+                    name: `image-${i}.${fileType || "jpg"}`,
+                    type: `image/${fileType === "jpg" ? "jpeg" : fileType || "jpeg"}`
+                });
+            });
+
+            // ✅ Debug
+            console.log("=== FORM DATA ===");
+            for (let pair of formData.entries()) {
+                console.log(pair[0], pair[1]);
+            }
+
+            const { data } = await api.post('/products', formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data"
+                }
+            });
+
+            if (!data?.success) throw new Error("Upload Failed");
+
+            Toast.show({
+                type: "success",
+                text1: "Success",
+                text2: "Product Created"
+            });
+
+            router.replace("/admin/products");
+
+        } catch (error:any) {
+            console.error("❌ ERROR FULL:", error);
+            console.error("❌ RESPONSE:", error?.response?.data);
+
+            Toast.show({
+                type: "error",
+                text1: "Failed to Create Product",
+                text2: error.response?.data?.message || error.message
+            });
+
+        } finally {
+            setSubmitting(false);
         }
     };
 

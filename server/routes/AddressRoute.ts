@@ -5,10 +5,10 @@ import { addAddresses, DeleteAddresses, getAddresses, updateAddresses } from "..
 
 const AddressRoute = express.Router();
 
+AddressRoute.post("/", protect, addAddresses);
 AddressRoute.get("/", protect, getAddresses);
-AddressRoute.get("/", protect, addAddresses);
-AddressRoute.get("/:id", protect, updateAddresses);
-AddressRoute.get("/:id", protect, DeleteAddresses);
+AddressRoute.put("/:id", protect, updateAddresses);
+AddressRoute.delete("/:id", protect, DeleteAddresses);
 
 
 

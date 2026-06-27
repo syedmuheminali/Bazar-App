@@ -93,7 +93,10 @@ export const UpdateCartItems = async (req: Request, res: Response) => {
         }
 
         if (quantity <= 0) {
-            cart.items = cart.items.filter((item) => { item.product.toString() !== productId })
+            // cart.items = cart.items.filter((item) => { item.product.toString() !== productId })
+            cart.items = cart.items.filter(
+                (item) => item.product.toString() !== productId
+            )
         } else {
             const Product = await product.findById(productId);
             if (Product!.stock < quantity) {
@@ -117,7 +120,7 @@ export const UpdateCartItems = async (req: Request, res: Response) => {
 
 export const RemoveCartItems = async (req: Request, res: Response) => {
     try {
-        const { size } = req.body;
+        const { size } = req.query;
         const cart = await Cart.findOne({ user: req.user._id });
 
         if (!cart || !size) {
@@ -151,6 +154,8 @@ export const ClearCartItems = async (req: Request, res: Response) => {
             cart.totalAmount = 0
             await cart.save()
         }
+
+        res.status(200).json({ success: true, message:"Cart cleared" })
 
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message })

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Order from "../models/Order.js";
 import Cart from "../models/Cart.js";
 import product from "../models/Products.js";
+import { IProduct } from "../types/index.js";
 
 
 
@@ -57,7 +58,9 @@ export const createOrder = async (req: Request, res: Response) => {
     try {
         const { shippingAddress, notes } = req.body;
 
-        const cart = await Cart.findOne({ user: req.user._id }).populate("items.product");
+        // const cart = await Cart.findOne({ user: req.user._id }).populate("items.product");
+        const cart = await Cart.findOne({ user: req.user._id })
+            .populate<{ items: { product: IProduct; quantity: number; price: number; size?: string }[] }>("items.product");
 
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ success: false, message: "Cart is Empty!" })
@@ -79,14 +82,15 @@ export const createOrder = async (req: Request, res: Response) => {
 
             orderItems.push({
                 product: item.product._id,
-                name: (item.product as any),
+                name: item.product.name,
                 quantity: item.quantity,
                 price: item.price,
                 size: item.size
             })
             // Reduce stock
-            Product.stock -= item.quantity;
-            await Product.save();
+              item.product.stock -= item.quantity;
+    await item.product.save();
+
         }
 
         const subtotal = cart.totalAmount;

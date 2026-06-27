@@ -1,7 +1,7 @@
-import { dummyProducts } from '@/assets/assets';
 import Header from '@/components/Header';
 import ProductCard from '@/components/ProductCard';
 import { COLORS } from '@/constants';
+import api from '@/constants/api';
 import { Product } from '@/constants/types';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
@@ -24,18 +24,17 @@ export default function shop() {
         }
 
         try {
-            const start = (pageNumber - 1) * 10;
-            const end = start + 10;
+            const queryParams: any = { page: pageNumber, limit: 10 };
 
-            const paginatedData = dummyProducts.slice(start, end);
+            const { data } = await api.get("/products", { params: queryParams })
 
             if (pageNumber === 1) {
-                setProduct(paginatedData)
+                setProduct(data?.data)
             } else {
-                setProduct(prev => [...prev, ...paginatedData])
+                setProduct(prev => [...prev, ...data?.data])
             }
 
-            setHasMore(end < dummyProducts.length);
+          setHasMore(data?.pagination?.page < data?.pagination?.page);
             setPage(pageNumber)
         } catch (error) {
             console.error("Error fetching products:", error);

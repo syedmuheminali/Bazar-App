@@ -3,10 +3,11 @@ import CategoryItem from '@/components/CategoryItem';
 import Header from '@/components/Header';
 import ProductCard from '@/components/ProductCard';
 import { CATEGORIES } from '@/constants';
+import api from '@/constants/api';
 import { Product } from '@/constants/types';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Home() {
@@ -17,10 +18,21 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<Product[]>([])
 
-  const category = [{ id: 'all', name: "All", icon: "grid" }, ...CATEGORIES]
+  const category = [{ id: 'all', name: "All", icon: "grid" }, ...CATEGORIES];
+
   const fetchProducts = async () => {
-    setProducts(dummyProducts);
-    setLoading(false)
+    try {
+      const { data } = await api.get("/products");
+
+      if (data.success) {
+        setProducts(data?.data);
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to fetch products. Please try again later.");
+    }
+    finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {

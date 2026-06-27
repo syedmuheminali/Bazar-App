@@ -29,10 +29,10 @@ const port = process.env.PORT || 3000;
 const startServer = async () => {
     await connectDB(); // await MongoDB connection
     await makeAdmin(); // create admin after DB connected
-    // app.listen(port, () => {
-    //   console.log(`🚀 Server is running at http://localhost:${port}`);
-    // });
+    app.listen(port, () => {
+        console.log(`🚀 Server is running at http://localhost:${port}`);
+    });
 };
-// server livehttps://bazar-app-six.vercel.app/
+// server live https://bazar-app-dusky.vercel.app/
 startServer();
 export default app;

@@ -2,24 +2,43 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, Text, View, ActivityIndicator, RefreshControl } from "react-native";
 import { COLORS, getStatusColor } from "@/constants";
-import { dummyAdminStats } from "@/assets/assets";
+import { useAuth } from "@clerk/expo";
+import api from "@/constants/api";
 
 export default function AdminDashboard() {
+    const {getToken} = useAuth()
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [stats, setStats] = useState({
-        totalUsers: 0,
-        totalProducts: 0,
+        totalUser: 0,
+        totalProduct: 0,
         totalOrders: 0,
         totalRevenue: 0,
         recentOrders: []
     });
 
     const fetchStats = async () => {
-        setStats(dummyAdminStats as any);
-        setLoading(false);
-        setRefreshing(false);
+        try {
+            const token = await getToken();
+            const { data } = await api.get('/admin/stats', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+
+            if (data?.success) {
+                setStats(data)
+            }
+        } catch (error) {
+            console.error("Failed to fetch admin stats:",error)
+        }
+
+        finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+            
     };
 
     useEffect(() => {
@@ -47,34 +66,34 @@ export default function AdminDashboard() {
             <View className="mb-8">
                 <Text className="text-primary font-bold text-2xl mb-4 tracking-tight">Overview</Text>
                 <View className="flex-row flex-wrap justify-between">
-                    <StatCard label="Total Revenue" value={`$${stats.totalRevenue.toFixed(2)}`} />
-                    <StatCard label="Total Orders" value={stats.totalOrders.toString()} />
-                    <StatCard label="Products" value={stats.totalProducts.toString()} />
-                    <StatCard label="Users" value={stats.totalUsers.toString()} />
+                    <StatCard label="Total Revenue" value={`$${stats?.totalRevenue?.toFixed(2)}`} />
+                    <StatCard label="Total Orders" value={stats?.totalOrders?.toString()} />
+                    <StatCard label="Products" value={stats?.totalProduct?.toString()} />
+                    <StatCard label="Users" value={stats?.totalUser?.toString()} />
                 </View>
             </View>
 
             <View className="mb-6">
                 <Text className="text-primary font-bold text-2xl mb-4 tracking-tight">Recent Orders</Text>
-                {stats.recentOrders.length === 0 ? (
+                {stats?.recentOrders?.length === 0 ? (
                     <View className="bg-white p-6 rounded-2xl border border-gray-100 items-center">
                         <Text className="text-secondary">No recent orders</Text>
                     </View>
                 ) : (
-                    stats.recentOrders.map((order: any) => (
-                        <View key={order._id} className="bg-white p-5 rounded-2xl border border-gray-100 mb-3">
+                    stats && stats?.recentOrders?.map((order: any) => (
+                        <View key={order?._id} className="bg-white p-5 rounded-2xl border border-gray-100 mb-3">
                             <View className="flex-row justify-between items-center mb-3">
                                 <View>
-                                    <Text className="font-bold text-primary text-base">Total Products : {order.items.reduce((acc: number, item: any) => acc + item.quantity, 0)}</Text>
-                                    <Text className="text-secondary text-xs mt-1">{new Date(order.createdAt).toLocaleDateString()}</Text>
+                                    <Text className="font-bold text-primary text-base">Total Products : {order?.items.reduce((acc: number, item: any) => acc + item.quantity, 0)}</Text>
+                                    <Text className="text-secondary text-xs mt-1">{new Date(order?.createdAt).toLocaleDateString()}</Text>
                                 </View>
-                                <View className={`px-3 py-1.5 rounded-full ${getStatusColor(order.orderStatus)}`}>
-                                    <Text className="text-[10px] font-bold uppercase">{order.orderStatus}</Text>
+                                <View className={`px-3 py-1.5 rounded-full ${getStatusColor(order?.orderStatus)}`}>
+                                    <Text className="text-[10px] font-bold uppercase">{order?.orderStatus}</Text>
                                 </View>
                             </View>
                             <View className="pb-2">
-                                {order.items.map((item: any) => (
-                                    <Text key={item._id} className="text-secondary text-xs mt-1">{item.name} x {item.quantity}</Text>
+                                {order && order?.items?.map((item: any) => (
+                                    <Text key={item?._id} className="text-secondary text-xs mt-1">{item?.name} x {item?.quantity}</Text>
                                 ))}
                             </View>
 

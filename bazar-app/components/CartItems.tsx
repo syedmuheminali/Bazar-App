@@ -32,17 +32,33 @@ export default function CartItems({ item, onRemove, onUpdateQuantity }: CartItem
                 <View className='flex-row justify-between items-center mt-2'>
                     <Text className='text-primary font-bold text-base'>Rs: {item.product.price.toFixed(2)}</Text>
 
-                    <View className='flex-row items-center bg-surface rounded-full px-2 py-1'>
-                        <TouchableOpacity className='pl-1' onPress={() => onUpdateQuantity && onUpdateQuantity(item.quantity - 1)}>
+                   <View className='flex-row items-center bg-surface rounded-full px-2 py-1'>
+
+                        {/* MINUS */}
+                        <TouchableOpacity
+                            className='pl-1'
+                            onPress={() => {
+                                // console.log("MINUS CLICK", item.quantity - 1);
+                                onUpdateQuantity && onUpdateQuantity(item.quantity - 1);
+                            }}
+                        >
                             <Ionicons name='remove' size={16} color={COLORS.primary} />
                         </TouchableOpacity>
 
-                        <Text className='text-primary font-medium mx-3'>{item?.quantity}</Text>
+                        <Text className='text-primary font-medium mx-3'>
+                            {item?.quantity}
+                        </Text>
 
-                        <TouchableOpacity className='pl-1' onPress={() => onUpdateQuantity && onUpdateQuantity(item.quantity - 1)}>
+                        {/* PLUS */}
+                        <TouchableOpacity
+                            className='pl-1'
+                            onPress={() => {
+                                // console.log("PLUS CLICK", item.quantity + 1);
+                                onUpdateQuantity && onUpdateQuantity(item.quantity + 1);
+                            }}
+                        >
                             <Ionicons name='add' size={16} color={COLORS.primary} />
                         </TouchableOpacity>
-
 
                     </View>
                 </View>
